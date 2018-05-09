@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>News Today</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+        .heading {
+            text-align: center;
+            background: #179e95;
+            padding: 15px 0;
+            margin: 0;
+            color: #fff;
+        }
+        .righ-wrapper {
+            float: right;
+        }
+        .newslist {
+            clear: both;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        .newslist li {
+            width: 21%;
+            display: inline-block;
+            margin: 2% 1%;
+            background-color: #f4f4f4;
+            padding: 1%;
+            vertical-align: top;
+            border-radius: 10px;
+        }
+        .newslist li h3 {
+            height: 67px;
+            overflow: hidden;
+        }
+        .newslist li h3 a {
+            color: #000;
+            text-decoration: none
+        }
+        .newslist li .date {
+            color: crimson;
+        }
+        .newslist li .author {
+            float: right;
+            color: crimson;
+            width: 110px;
+            height: 19px;
+            overflow: hidden;
+        }
+        .newslist li p {
+            height: 72px;
+            overflow: hidden;
+        }
+        .newslist li img {
+            width: 100%;
+            height: 210px;
+        }
+        input, select {
+            padding: 7px;
+            margin: 15px;
+            width: 150px;
+            background: #fff;
+            border: 1px solid #ccc;
+        }
+        .submit {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h1 class="heading">Global News</h1>
+<select class="country">
+    <option selected value="in">India</option>
+    <option value="us">USA</option>
+    <option value="cn">China</option>
+    <option value="ru">Russia</option>
+    <option value="jp">Japan</option>
+    <option value="za">South Africa</option>
+    <option value="ae">UAE</option>
+    <option value="tr">Turkey</option>
+</select>
+
+<div class="righ-wrapper">
+    <form>
+        <input type="text" placeholder="iPhone" class="keywords">
+        <input type="date" placeholder="08-05-2018" class="date">
+        <input type="button" value="Search" class="submit" />
+    </form>
+</div>
+
+<ul class="newslist">
+
+</ul>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    var config = {}
+    config.country = 'in';
+    $(document).ready(function(){
+        var url = 'https://newsapi.org/v2/top-headlines?country='+config.country+'&apiKey=3938ab30ffcd4cf3915373714dae6727';
+        getData(url);
+    });
+
+    $('.country').on('change', function(){
+        config.country = $(this).val();
+        var url = 'https://newsapi.org/v2/top-headlines?country='+config.country+'&apiKey=3938ab30ffcd4cf3915373714dae6727';
+        getData(url);
+    });
+
+    $('.submit').on('click', function(e){
+       var keyword = $('.keywords').val();
+       var date = $('.date').val();
+       if(keyword.length < 3){
+        alert('Enter valid keyword to search, minimum 3 character');
+        return false;
+       }
+       if(!date){
+         alert('Enter valid date to search');
+         return false;
+       }
+       var url = 'https://newsapi.org/v2/everything?q='+keyword+'&from='+date+'&sortBy=popularity&apiKey=3938ab30ffcd4cf3915373714dae6727';
+       getData(url);
+       e.preventDefault();
+    });
+
+
+    function getData(url){
+        $.ajax({url: url,
+            dataType: 'json',
+            success: function(result){
+                $('.newslist').html('');
+                $.each(result.articles, function(index, element) {
+                    var date = new Date(element.publishedAt).toISOString().slice(0,10);
+                    var author = element.author ? element.author : ' ';
+                    var li = '<li><h3><a href="'+element.url+'" target="_blank">'+element.title+'</a></h3><span class="date">'+date+'</span><span class="author">'+author+'</span><p>'+element.description+'</p><img src="'+element.urlToImage+'" /></li>'
+                    $('.newslist').append(li);
+                });
+            },
+            error: function(err){
+                alert('Error fetching data');
+            }
+          });
+    }
+
+</script>
+</body>
+</html>
